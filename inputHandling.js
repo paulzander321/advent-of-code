@@ -19,7 +19,7 @@ function populateChoices() {
   select.selectedIndex = (adventDays - 1);
 }
 
-//Create one option element
+//Create option element with given text and value
 function createOption(text, value) {
   let option = document.createElement("option");
   option.textContent = text;
@@ -27,31 +27,8 @@ function createOption(text, value) {
   return option;
 }
 
-//Clear input / output
-function clearText() {
+//reset puzzle input & output
+function resetPuzzle() {
   document.getElementById("puzzleinput").value = "";
   document.getElementById("puzzleoutput").innerHTML = "";
-  document.getElementById("puzzleinput").readOnly = false;
-}
-
-//reset puzzle
-function resetPuzzle() {
-  clearText();
-}
-
-//saves puzzle input to local storage
-function savePuzzleInput(puzzleIndex) {
-  let currentPuzzleInput = document.getElementById("puzzleinput").value
-  console.log(currentPuzzleInput);
-  let currentPuzzleIndex = document.getElementById("puzzlechoice").selectedIndex;
-  console.log(currentPuzzleIndex);
-  localStorage.setItem("PuzzleInput" + currentPuzzleIndex, currentPuzzleInput);
-}
-
-//attempts to retrieve puzzle input from local storage
-function loadPuzzleInput(puzzleIndex) {
-  let savedPuzzleInput = localStorage.getItem("PuzzleInput" + puzzleIndex);
-  if (savedPuzzleInput) {
-    document.getElementById("puzzleinput").value = savedPuzzleInput;
-  }
 }
