@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <title>My Janky Advent of Code 2023</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <link rel="stylesheet alternate" type="text/css" href="css/highcontrast.css">
+    <script type="text/javascript" src="puzzles.js"></script>
+    <script type="text/javascript" src="inputHandling.js"></script>
+  </head>
+  <body>
+    <h1 class="title-global" id="intro">Advent of Code 2023 Jank App</h1>
+    <div class="custom-select">
+      <select title="puzzlechoice" name="puzzlechoice" onchange="clearText()" id="puzzlechoice" name="puzzlechoice">
+      </select>
+      <button type="button" class="button" onclick="runPuzzle()">Run Puzzle</button>
+      <button type="button" class="button" onclick="resetPuzzle()">Reset</button>
+      <br>
+      <p>Input:</p>
+      <textarea title="puzzleinput" id="puzzleinput" rows="8" cols="140"></textarea>
+      <p>Output:</p>
+      <p id="puzzleoutput"></p>
+    </div>
+  </body>
+</html>

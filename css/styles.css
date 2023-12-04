@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300');
+
+/* Basic styling for the button */
+.button {
+  background-color: limegreen; /* Lime green background */
+  color: white; /* White text */
+  padding: 10px 20px; /* Top and bottom padding of 10px, left and right padding of 20px */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Cursor changes to pointer to indicate it's clickable */
+  font-size: 16px; /* Font size */
+  transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
+  outline: none; /* Remove outline */
+  text-align: center; /* Center the text inside the button */
+  display: inline-block; /* Allows setting margins and doesn't break the flow */
+}
+
+/* Hover effect for the button */
+.button:hover {
+  background-color: #32cd32; /* A slightly darker lime green color for hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect for depth */
+}
+
+/* Active state for the button */
+.button:active {
+  background-color: #2e8b57; /* Even darker shade for when the button is clicked */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Slightly less shadow */
+}
+
+
+button {
+  background-color: #04AA6D; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 15px 15px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 10px;
+}
+
+select {
+  margin: 10px;
+  width: 250px;
+  padding: 5px 5px 5px 15px;
+  font-size: 18px;
+  font-family: "Source Code Pro", monospace;
+  border: 1px solid #CCC;
+  height: 50px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: #0f0f23; /*337 x 5*/
+  color: #cccccc;
+  border-radius: 5px;
+}
+
+body {
+  background: #0f0f23; /*337 x 5*/
+  color: #cccccc;
+  font-family: "Source Code Pro", monospace;
+  font-weight: 300;
+  font-size: 14pt;
+  min-width: 60em;
+}
+
+header {
+  white-space: nowrap;
+  cursor: default;
+  z-index: 100;
+  margin-bottom: 2em;
+}
+header h1 {
+  display: inline-block;
+  margin: 0;
+  padding-right: 1em;
+}
+header h1 a, header h1 span {
+  display: inline-block;
+  text-decoration: none;
+  color: #00cc00;
+  text-shadow: 0 0 2px #00cc00, 0 0 5px #00cc00;
+}
+header h1 a:hover, header h1 a:focus {
+  color: #99ff99;
+  text-shadow: 0 0 2px #99ff99, 0 0 5px #99ff99;
+}
+header h1.title-event .title-event-wrap {
+  opacity: .33;
+  white-space: pre;
+}
+
+input[type="text"], textarea {
+  background: transparent;
+  color: inherit;
+  border: 1px solid #666666;
+  background: #10101a;
+  padding: 0 2px;
+  font-family: inherit;
+  font-size: inherit;
+  margin: 0;
+  border-radius: 5px;
+}
+textarea {
+  vertical-align: top;
+}
