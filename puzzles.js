@@ -1,9 +1,9 @@
 //Main function to determine which puzzle to run based on input
 function runPuzzle() {
   let functionName = document.getElementById("puzzlechoice").value
-  document.getElementById("puzzleinput").readOnly = true;
   if (typeof window[functionName] === "function") {
     window[functionName]();
+    savePuzzleInput(document.getElementById("puzzlechoice").selectedIndex);
   } else {
     document.getElementById("puzzleoutput").innerText = "Puzzle not implemented yet!";
   }
