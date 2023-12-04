@@ -9,14 +9,14 @@ function populateChoices() {
   if (!select) return; // Validation to ensure select element exists
 
   //Calculate how many puzzles to populate, set default to the current day puzzle
-  const xmasDay = new Date('2023-12-25');
+  const xmasDay = new Date(Date.UTC(2023, 11, 25, 5));
   const today = new Date();
-  let daysTilXmas = Math.floor((xmasDay - today) / (1000 * 60 * 60 * 24));
-  let adventDays = Math.min(25, 24 - daysTilXmas);
-  for (let i = 1; i <= adventDays; i++) {
+  let daysTilXmas = Math.ceil((xmasDay - today) / (1000 * 60 * 60 * 24));
+  let daysOfPuzzleReleased = Math.min(25, 25 - daysTilXmas);
+  for (let i = 1; i <= daysOfPuzzleReleased; i++) {
     select.appendChild(createOption(`Day ${i}`, `day${i}`));
   }
-  select.selectedIndex = (adventDays - 1);
+  select.selectedIndex = (daysOfPuzzleReleased - 1);
 }
 
 //Create option element with given text and value

@@ -3,7 +3,6 @@ function runPuzzle() {
   let functionName = document.getElementById("puzzlechoice").value
   if (typeof window[functionName] === "function") {
     window[functionName]();
-    savePuzzleInput(document.getElementById("puzzlechoice").selectedIndex);
   } else {
     document.getElementById("puzzleoutput").innerText = "Puzzle not implemented yet!";
   }
@@ -14,7 +13,7 @@ function day5() {
   let input = document.getElementById("puzzleinput").value;
   let lines = input.split("\n");
 
-  
+
 
   document.getElementById("puzzleoutput").innerText = "Part 1: Not yet implemented!";
   document.getElementById("puzzleoutput").innerText += "\nPart 2: Not yet implemented!";
