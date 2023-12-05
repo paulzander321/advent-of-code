@@ -8,11 +8,26 @@ function runPuzzle() {
   }
 }
 
+//Hmm
+function day6() {
+  let input = document.getElementById("puzzleinput").value;
+  let lines = input.split("\n");
+  let part1Answer = 0;
+  let part2Answer = 0;
+
+  
+
+  document.getElementById("puzzleoutput").innerText = "Part 1: Answer = " + part1Answer;
+  document.getElementById("puzzleoutput").innerText += "\nPart 2: Answer = " + part2Answer;
+}
+
+//#region Solved Puzzles
+
 //Day 5 - Ugh
 function day5() {
   let input = document.getElementById("puzzleinput").value;
   let lines = input.split("\n");
-
+  
   //our starting values
   let seeds = lines[0].split(' ');
 
@@ -45,110 +60,33 @@ function day5() {
     }
   }
 
-  // Build out reverse map to get the direct seed -> locations
+  // Build out reverse map to get the direct seed -> locations........... Is what I SHOULD do :)
+  // Dear reader... listen, I will look to make a nicer solution eventually.
+  // I did however discover that my gaming laptop is suitable for crypto mining so that's something!
   let part2MinLocation = 0;
-  // for (let i = 1; i < seeds.length; i = i + 2) {
-  //   let seedStart = parseInt(seeds[i]);
-  //   let seedCount = parseInt(seeds[i + 1]);
-  //   for (let j = seedStart; j < seedStart + seedCount; j++) {
-  //     let soil = seedSoilMap.translateSourceValue(j);
-  //     let fert = soilFertMap.translateSourceValue(soil);
-  //     let water = fertWaterMap.translateSourceValue(fert);
-  //     let light = WaterLightMap.translateSourceValue(water);
-  //     let temp = lightTempMap.translateSourceValue(light);
-  //     let humidity = tempHumidityMap.translateSourceValue(temp);
-  //     let location = humidityLocationMap.translateSourceValue(humidity);
-  //     if (part2MinLocation == 0) {
-  //       part2MinLocation = location;
-  //     } else if (location < part2MinLocation) {
-  //       part2MinLocation = location;
-  //     }
-  //   }
-  // }
+  for (let i = 1; i < seeds.length; i = i + 2) {
+    let seedStart = parseInt(seeds[i]);
+    let seedCount = parseInt(seeds[i + 1]);
+    console.log(i);
+    for (let j = seedStart; j < seedStart + seedCount; j++) {
+      let soil = seedSoilMap.translateSourceValue(j);
+      let fert = soilFertMap.translateSourceValue(soil);
+      let water = fertWaterMap.translateSourceValue(fert);
+      let light = WaterLightMap.translateSourceValue(water);
+      let temp = lightTempMap.translateSourceValue(light);
+      let humidity = tempHumidityMap.translateSourceValue(temp);
+      let location = humidityLocationMap.translateSourceValue(humidity);
+      if (part2MinLocation == 0) {
+        part2MinLocation = location;
+      } else if (location < part2MinLocation) {
+        part2MinLocation = location;
+      }
+    }
+  }
 
   document.getElementById("puzzleoutput").innerText = "Part 1: Minimum Location = " + minLocation;
   document.getElementById("puzzleoutput").innerText += "\nPart 2: Minimum Location = " + part2MinLocation;
 }
-
-class AlmanacMap {
-  //Create new almanac map reading from the given input string array for the specified map
-  constructor(from, to, lines) {
-    this.ranges = new Array();
-    this.from = from;
-    this.to = to;
-
-    //Parse the map out from the given lines if provided
-    if (lines != "") {
-      let mapStarted = false;
-      for (let i = 0; i < lines.length; i++) {
-        let lineSplit = lines[i].split(' ');
-        if (mapStarted) {
-          if (lineSplit.length == 3) {
-            this.ranges.push(new AlmanacRange(lineSplit[0], lineSplit[1], lineSplit[2]));
-          } else {
-            //finished parsing map
-            break;
-          }
-        } else if (lineSplit[0] == this.from + '-to-' + this.to) {
-          mapStarted = true;
-        }
-      }
-    }
-  }
-
-  //Push the given almanac range to map
-  pushRange(range) {
-    this.ranges.push(range);
-  }
-
-  //Prints this almanac map
-  print() {
-    let printValue = "";
-    for (let i = 0; i < this.ranges.length; i++) {
-      printValue += this.ranges[i].print() + ',';
-    }
-    return printValue;
-  }
-
-  //Translate given source value using this map's ranges
-  translateSourceValue(sourceValue) {
-    for (let i = 0; i < this.ranges.length; i++) {
-      if (this.ranges[i].isSrcValueInRange(sourceValue)) {
-        return this.ranges[i].translateSourceValue(sourceValue);
-      }
-    }
-    return sourceValue;
-  }
-}
-
-class AlmanacRange {
-  //Constructs new almanac range with given input values
-  constructor(outputStart, inputStart, range) {
-    this.outputStart = parseInt(outputStart);
-    this.inputStart = parseInt(inputStart);
-    this.range = parseInt(range);
-  }
-
-  //Returns true if the given source value is within this ranges input value range
-  isSrcValueInRange(srcValue) {
-    if (srcValue >= this.inputStart && srcValue <= this.inputStart + this.range - 1) {
-      return true;
-    }
-    return false;
-  }
-
-  //Translates given source value input using the map
-  translateSourceValue(srcValue) {
-    return this.outputStart + (srcValue - this.inputStart);
-  }
-
-  //Prints out the AlmanacRange
-  print() {
-    return "{ inputStart: " + this.inputStart + ", range: " + this.range + ", outputStart: " + this.outputStart + '}';
-  }
-}
-
-//#region Solved Puzzles
 
 //Part 1: Calculates the point total for given scratch tickets
 //Part 2: Calculate total number of tickets, including copies generated from wins
@@ -416,8 +354,84 @@ function day1() {
 }
 //#endregion
 
-//#region Helper Functions
+//#region Helper Functions & Classes
+class AlmanacMap {
+  //Create new almanac map reading from the given input string array for the specified map
+  constructor(dataTypeFrom, dataTypeTo, lines) {
+    this.ranges = new Array();
+    this.dataTypeFrom = dataTypeFrom;
+    this.dataTypeTo = dataTypeTo;
 
+    //Parse the map out from the given lines if provided
+    if (lines != "") {
+      let mapStarted = false;
+      for (let i = 0; i < lines.length; i++) {
+        let lineSplit = lines[i].split(' ');
+        if (mapStarted) {
+          if (lineSplit.length == 3) {
+            this.ranges.push(new AlmanacRange(lineSplit[0], lineSplit[1], lineSplit[2]));
+          } else {
+            //finished parsing map
+            break;
+          }
+        } else if (lineSplit[0] == this.dataTypeFrom + '-to-' + this.dataTypeTo) {
+          mapStarted = true;
+        }
+      }
+    }
+  }
+
+  //Push the given almanac range to map
+  pushRange(range) {
+    this.ranges.push(range);
+  }
+
+  //Prints this almanac map
+  print() {
+    let printValue = "";
+    for (let i = 0; i < this.ranges.length; i++) {
+      printValue += this.ranges[i].print() + ',';
+    }
+    return printValue;
+  }
+
+  //Translate given source value using this map's ranges
+  translateSourceValue(sourceValue) {
+    for (let i = 0; i < this.ranges.length; i++) {
+      if (this.ranges[i].isSrcValueInRange(sourceValue)) {
+        return this.ranges[i].translateSourceValue(sourceValue);
+      }
+    }
+    return sourceValue;
+  }
+}
+
+class AlmanacRange {
+  //Constructs new almanac range with given input values
+  constructor(outputStart, inputStart, range) {
+    this.outputStart = parseInt(outputStart);
+    this.inputStart = parseInt(inputStart);
+    this.range = parseInt(range);
+  }
+
+  //Returns true if the given source value is within this ranges input value range
+  isSrcValueInRange(srcValue) {
+    if (srcValue >= this.inputStart && srcValue <= this.inputStart + this.range - 1) {
+      return true;
+    }
+    return false;
+  }
+
+  //Translates given source value input using the map
+  translateSourceValue(srcValue) {
+    return this.outputStart + (srcValue - this.inputStart);
+  }
+
+  //Prints out the AlmanacRange
+  print() {
+    return "{ inputStart: " + this.inputStart + ", range: " + this.range + ", outputStart: " + this.outputStart + '}';
+  }
+}
 
 function isNumSpelledOut(numString) {
   if (numString.includes("one")) {
