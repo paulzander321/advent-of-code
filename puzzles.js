@@ -13,10 +13,175 @@ function day5() {
   let input = document.getElementById("puzzleinput").value;
   let lines = input.split("\n");
 
+  //our starting values
+  let seeds = lines[0].split(' ');
+
+  let minLocation = 0;
+  let part2MinLocation = 0;
+  let seedSoilMap = new AlmanacMap("seed", "soil", lines);
+  let soilFertMap = new AlmanacMap("soil", "fertilizer", lines);
+  let fertWaterMap = new AlmanacMap("fertilizer", "water", lines);
+  let WaterLightMap = new AlmanacMap("water", "light", lines);
+  let lightTempMap = new AlmanacMap("light", "temperature", lines);
+  let tempHumidityMap = new AlmanacMap("temperature", "humidity", lines);
+  let humidityLocationMap = new AlmanacMap("humidity", "location", lines);
+
+  console.log(seedSoilMap.print());
+  console.log(soilFertMap.print());
+  console.log(seedSoilMap.combineMaps(soilFertMap));
+
+  for (let i = 0; i < seeds.length; i++) {
+    if (!isNaN(seeds[i])) {
+      let seed = parseInt(seeds[i]);
+      let soil = seedSoilMap.translateSourceValue(seed);
+      let fert = soilFertMap.translateSourceValue(soil);
+      let water = fertWaterMap.translateSourceValue(fert);
+      let light = WaterLightMap.translateSourceValue(water);
+      let temp = lightTempMap.translateSourceValue(light);
+      let humidity = tempHumidityMap.translateSourceValue(temp);
+      let location = humidityLocationMap.translateSourceValue(humidity);
+      if (minLocation == 0) {
+        minLocation = location;
+      } else if (location < minLocation) {
+        minLocation = location;
+      }
+    }
+  }
+
+  //Build out reverse map to get the direct seed -> locations
+  
+
+  document.getElementById("puzzleoutput").innerText = "Part 1: Minimum Location = " + minLocation;
+  document.getElementById("puzzleoutput").innerText += "\nPart 2: Minimum Location = " + part2MinLocation;
+}
+
+class AlmanacMap {
+  //Create new almanac map reading from the given input string array for the specified map
+  constructor(from, to, lines) {
+    this.ranges = new Array();
+    this.from = from;
+    this.to = to;
+
+    //Parse the map out from the given lines if provided
+    if (lines != "") {
+      let mapStarted = false;
+      for (let i = 0; i < lines.length; i++) {
+        let lineSplit = lines[i].split(' ');
+        if (mapStarted) {
+          if (lineSplit.length == 3) {
+            this.ranges.push(new AlmanacRange(lineSplit[0], lineSplit[1], lineSplit[2]));
+          } else {
+            //finished parsing map
+            break;
+          }
+        } else if (lineSplit[0] == this.from + '-to-' + this.to) {
+          mapStarted = true;
+        }
+      }
+    }
+  }
+  //Reset processed flag for all ranges
+  resetProcessed() {
+    for (let i = 0; i < this.ranges.length; i++) {
+      this.ranges[i].processed = false;
+    }
+  }
+  //Push the given almanac range to map
+  pushRange(range) {
+    this.ranges.push(range);
+  }
+  //Prints this almanac map
+  print() {
+    let printValue = "";
+    for (let i = 0; i < this.ranges.length; i++) {
+      printValue += this.ranges[i].print() + ',';
+    }
+    return printValue;
+  }
+  //Translate given source value using this map's ranges
+  translateSourceValue(sourceValue) {
+    for (let i = 0; i < this.ranges.length; i++) {
+      if (this.ranges[i].isSrcValueInRange(sourceValue)) {
+        return this.ranges[i].translateSourceValue(sourceValue);
+      }
+    }
+    return sourceValue;
+  }
+  //Orders this maps ranges by output start descending
+  sortByRangeOutputStartDesc() {
+    this.ranges = this.ranges.reverse();
+  }
+  //Work in progress -> Merge maps? cut out the middlemap?
+  combineMaps(connectMap) {
+    //verify the map we're connecting to is valid transition
+    if (this.to == connectMap.from) {
+      let newMap = new AlmanacMap(this.from, connectMap.to, "");
+      this.resetProcessed();
+      connectMap.resetProcessed();
+
+      for (let i = 0; i < this.ranges.length; i++) {
+        let overlap = false;
+        let currentRange = this.ranges[i];
+        
+        for (let j = 0; j < connectMap.ranges.length; j++) {
+          let toRange = connectMap.ranges[j];
+          if (currentRange.rangeOverlap(toRange)) {
+            overlap = true;
+            
+            //Split the ranges
 
 
-  document.getElementById("puzzleoutput").innerText = "Part 1: Not yet implemented!";
-  document.getElementById("puzzleoutput").innerText += "\nPart 2: Not yet implemented!";
+          }
+        }
+
+        //Push this maps range if no overlap with connectMap
+        if (!overlap) {
+          this.ranges[i].processed = true;
+          newMap.pushRange(currentRange);
+        }
+      }
+
+      //Push any leftover ranges from the connectMap (no overlap with this maps output)
+      for (let k = 0; k < connectMap.ranges.length; k++) {
+        if (!connectMap.ranges[k].processed) {
+          connectMap.ranges[k].processed = true;
+          newMap.pushRange(connectMap.ranges[k]);
+        }
+      }
+
+      return newMap;
+    }
+  }
+}
+
+
+class AlmanacRange {
+  //Constructs new almanac range with given input values
+  constructor(outputStart, inputStart, range) {
+    this.outputStart = parseInt(outputStart);
+    this.inputStart = parseInt(inputStart);
+    this.range = parseInt(range);
+    this.processed = false;
+  }
+  //Returns true if the given source value is within this ranges input value range
+  isSrcValueInRange(srcValue) {
+    if (srcValue >= this.inputStart && srcValue <= this.inputStart + this.range - 1) {
+      return true;
+    }
+    return false;
+  }
+  //Translates given source value input using the map
+  translateSourceValue(srcValue) {
+    return this.outputStart + (srcValue - this.inputStart);
+  }
+  //Prints out the AlmanacRange
+  print() {
+    return "{ inputStart: " + this.inputStart + ", range: " + this.range + ", outputStart: " + this.outputStart + '}';
+  }
+  //Returns true if the given toRange AlmanacRange overlaps with this AlmanacRange
+  rangeOverlap(toRange) {
+    return toRange.inputStart <= (this.outputStart + this.range - 1) && (toRange.inputStart + toRange.range - 1) >= this.outputStart
+  }
 }
 
 //#region Solved Puzzles
