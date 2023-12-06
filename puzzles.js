@@ -8,20 +8,88 @@ function runPuzzle() {
   }
 }
 
-//Hmm
-function day6() {
+//day 7 puzzle solution
+function day7() {
   let input = document.getElementById("puzzleinput").value;
   let lines = input.split("\n");
-  let part1Answer = 0;
-  let part2Answer = 0;
 
-  
 
-  document.getElementById("puzzleoutput").innerText = "Part 1: Answer = " + part1Answer;
-  document.getElementById("puzzleoutput").innerText += "\nPart 2: Answer = " + part2Answer;
+
+  document.getElementById("puzzleoutput").innerText = "Part 1: Answer = ";
+  document.getElementById("puzzleoutput").innerText += "\nPart 2: Answer = ";
 }
 
 //#region Solved Puzzles
+
+//Find the number of ways to win a boat race
+//given the time allowed and the record winning distance
+//each ms boat is held back it gains 1ms speed
+function day6() {
+  let input = document.getElementById("puzzleinput").value;
+  let lines = input.split("\n");
+
+  let waysToWin = 0;
+  letWaysToWinPart2 = 0;
+  if (lines.length > 0 && lines[0] != '') {
+
+    //parse the times
+    let times = new Array();
+    let timePart2 = "";
+    let lineSplitOne = lines[0].split(' ');
+    for (let i = 0; i < lineSplitOne.length; i++) {
+      if (lineSplitOne[i] != '' && !isNaN(lineSplitOne[i])) {
+        times.push(parseInt(lineSplitOne[i]));
+        timePart2 += lineSplitOne[i];
+      }
+    }
+
+    //parse the distances
+    let distances = new Array();
+    let distancePart2 = "";
+    let lineSplitTwo = lines[1].split(' ');
+    for (let i = 0; i < lineSplitTwo.length; i++) {
+      if (lineSplitTwo[i] != '' && !isNaN(lineSplitTwo[i])) {
+        distances.push(parseInt(lineSplitTwo[i]));
+        distancePart2 += lineSplitTwo[i];
+      }
+    }
+
+    //Iterate through the games
+    for (let i = 0; i < times.length; i++) {
+      let time = times[i];
+      let distance = distances[i];
+      let waysToWinThisGame = 0;
+
+      for (let j = 0; j <= time; j++) {
+        let secondsHeld = j;
+        let distanceTraveled = secondsHeld * (time - secondsHeld);
+        if (distanceTraveled > distance) {
+          waysToWinThisGame++;
+        }
+      }
+
+      if (waysToWin == 0) {
+        waysToWin = waysToWinThisGame;
+      } else {
+        waysToWin *= waysToWinThisGame;
+      }
+    }
+
+    //part 2 - one big game
+    timePart2 = parseInt(timePart2);
+    distancePart2 = parseInt(distancePart2);
+    for (let j = 0; j <= timePart2; j++) {
+      let secondsHeld = j;
+      let distanceTraveled = secondsHeld * (timePart2 - secondsHeld);
+      if (distanceTraveled > distancePart2) {
+        letWaysToWinPart2++;
+      }
+    }
+  }
+
+  document.getElementById("puzzleoutput").innerText = "Part 1: Answer = " + waysToWin;
+  document.getElementById("puzzleoutput").innerText += "\nPart 2: Answer = " + letWaysToWinPart2;
+}
 
 //Day 5 - Ugh
 function day5() {
@@ -355,6 +423,8 @@ function day1() {
 //#endregion
 
 //#region Helper Functions & Classes
+
+//Almanac Map Class
 class AlmanacMap {
   //Create new almanac map reading from the given input string array for the specified map
   constructor(dataTypeFrom, dataTypeTo, lines) {
@@ -380,12 +450,13 @@ class AlmanacMap {
       }
     }
   }
-
   //Push the given almanac range to map
   pushRange(range) {
+    if (range.range == 0) {
+      console.log("Help!");
+    }
     this.ranges.push(range);
   }
-
   //Prints this almanac map
   print() {
     let printValue = "";
@@ -394,7 +465,6 @@ class AlmanacMap {
     }
     return printValue;
   }
-
   //Translate given source value using this map's ranges
   translateSourceValue(sourceValue) {
     for (let i = 0; i < this.ranges.length; i++) {
@@ -406,14 +476,16 @@ class AlmanacMap {
   }
 }
 
+//Almanac Range Class
 class AlmanacRange {
   //Constructs new almanac range with given input values
   constructor(outputStart, inputStart, range) {
-    this.outputStart = parseInt(outputStart);
-    this.inputStart = parseInt(inputStart);
     this.range = parseInt(range);
+    this.inputStart = parseInt(inputStart);
+    this.inputEnd = this.inputStart + this.range - 1;
+    this.outputStart = parseInt(outputStart);
+    this.outputEnd = this.outputStart + this.range - 1;
   }
-
   //Returns true if the given source value is within this ranges input value range
   isSrcValueInRange(srcValue) {
     if (srcValue >= this.inputStart && srcValue <= this.inputStart + this.range - 1) {
@@ -421,12 +493,10 @@ class AlmanacRange {
     }
     return false;
   }
-
   //Translates given source value input using the map
   translateSourceValue(srcValue) {
     return this.outputStart + (srcValue - this.inputStart);
   }
-
   //Prints out the AlmanacRange
   print() {
     return "{ inputStart: " + this.inputStart + ", range: " + this.range + ", outputStart: " + this.outputStart + '}';
