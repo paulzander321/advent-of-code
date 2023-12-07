@@ -8,18 +8,185 @@ function runPuzzle() {
   }
 }
 
-//day 7 puzzle solution
-function day7() {
+function day8() {
   let input = document.getElementById("puzzleinput").value;
   let lines = input.split("\n");
 
 
 
-  document.getElementById("puzzleoutput").innerText = "Part 1: Answer = ";
-  document.getElementById("puzzleoutput").innerText += "\nPart 2: Answer = ";
+  //Return values
+  document.getElementById("puzzleoutput").innerText = "Part 1: Answer = " + 0;
+  document.getElementById("puzzleoutput").innerText += "\nPart 2: Answer = " + 0;
 }
 
 //#region Solved Puzzles
+
+//Value mapping for the camel game hand types
+const camelHandTypes = new Map([
+  ["5X", 6], ["4X", 5], ["FH", 4], ["3X", 3], ["2P", 2], ["1P", 1], ["HC", 0]
+]);
+
+//Card type value mapping
+const camelCardTypes = new Map([
+  ["A", 14],  ["K", 13],  ["Q", 12],  ["J", 11],  ["T", 10],  ["9", 9],  ["8", 8],
+  ["7", 7],  ["6", 6],  ["5", 5],  ["4", 4],  ["3", 3],  ["2", 2]
+]);
+
+//Card type value mapping for part 2 (J value changed)
+const camelCardTypesPart2 = new Map([
+  ["A", 14],  ["K", 13],  ["Q", 12],  ["T", 10],  ["9", 9],  ["8", 8],
+  ["7", 7],  ["6", 6],  ["5", 5],  ["4", 4],  ["3", 3],  ["2", 2], ["J", 1]
+]);
+
+//day 7 puzzle solution
+function day7() {
+  let input = document.getElementById("puzzleinput").value;
+  let lines = input.split("\n");
+  
+  //Parse the hands from input file
+  let hands = new Array();
+  for (let i = 0; i < lines.length; i++) {
+    let lineSplit = lines[i].split(' ');
+    hands.push(new CamelGameHand(lineSplit[0], parseInt(lineSplit[1])));
+  }
+
+  //Sort all hands by the type / card values from left to right
+  hands.sort(function(a, b) {
+    return a.compareTo(b);
+  });
+
+  //Sum up the total winnings using the hand rank + bid amount
+  let totalWinningsPartOne = 0;
+  for (let i = hands.length - 1; i >= 0; i--) {
+    totalWinningsPartOne += (hands[i].bid * (i + 1));
+  }
+
+  //Part 2
+  hands.sort(function(a, b) {
+    return a.compareToPartTwo(b);
+  });
+  let totalWinningsPartTwo = 0;
+  for (let i = hands.length - 1; i >= 0; i--) {
+    totalWinningsPartTwo += (hands[i].bid * (i + 1));
+  }
+
+  //Return values
+  document.getElementById("puzzleoutput").innerText = "Part 1: Answer = " + totalWinningsPartOne;
+  document.getElementById("puzzleoutput").innerText += "\nPart 2: Answer = " + totalWinningsPartTwo;
+}
+
+class CamelGameHand {
+  constructor(cards, bid) {
+    this.hand = cards;
+    this.cards = cards.split('');
+    this.bid = bid;
+    this.cardFrequencies = getFrequencies(this.cards);
+    this.handType = determineHandType(this.cardFrequencies, this.cards);
+    this.handTypePart2 = this.handType;
+
+    //Part Two: make some adjustments to the "J"s
+    if (cards.includes('J')) {
+      let maxFreqOtherThanJ = 0;
+      let maxFreqValue = "";
+      for (let i = 0; i < this.hand.length; i++) {
+        if (this.hand[i] != 'J') {
+          if (this.cardFrequencies.get(this.cards[i]) > maxFreqOtherThanJ) {
+            maxFreqOtherThanJ = this.cardFrequencies.get(this.cards[i])
+            maxFreqValue = this.cards[i];
+          } else if (this.cardFrequencies.get(this.cards[i]) == maxFreqOtherThanJ) {
+            let cardCompare = camelCardTypesPart2.get(this.cards[i]) - camelCardTypesPart2.get(maxFreqValue);
+            if (cardCompare > 0) {
+              maxFreqOtherThanJ = this.cardFrequencies.get(this.cards[i])
+              maxFreqValue = this.cards[i];
+            }
+          }
+        }
+      }
+      //An all-J hand should remain as-is
+      if (maxFreqOtherThanJ > 0) {
+        let newHand = cards.replaceAll('J', maxFreqValue).split('')
+        this.handTypePart2 = determineHandType(getFrequencies(newHand), newHand);
+      }
+    }
+  }
+
+  //Function to determine if one hand is better than another (wins based on hand type / card values)
+  compareTo(otherHand) {
+    let handCompare = camelHandTypes.get(this.handType) - camelHandTypes.get(otherHand.handType);
+    if (handCompare == 0) {
+      for (let i = 0; i < 5; i++) {
+        let cardCompare = camelCardTypes.get(this.cards[i]) - camelCardTypes.get(otherHand.cards[i]);
+        if (cardCompare == 0) {
+          //Do nothing
+        } else {
+          return cardCompare;
+        }
+      }
+    } else {
+      return handCompare;
+    }
+  }
+
+  compareToPartTwo(otherHand) {
+    let handCompare = camelHandTypes.get(this.handTypePart2) - camelHandTypes.get(otherHand.handTypePart2);
+    if (handCompare == 0) {
+      for (let i = 0; i < 5; i++) {
+        let cardCompare = camelCardTypesPart2.get(this.cards[i]) - camelCardTypesPart2.get(otherHand.cards[i]);
+        if (cardCompare == 0) {
+          //Do nothing
+        } else {
+          return cardCompare;
+        }
+      }
+    } else {
+      return handCompare;
+    }
+  }
+}
+
+//Get the frequencies of cards in hand
+function getFrequencies(cardArray) {
+  let cardFrequencies = new Map();
+  for (let j = 0; j < cardArray.length; j++) {
+    if (cardFrequencies.has(cardArray[j])) {
+      cardFrequencies.set(cardArray[j], cardFrequencies.get(cardArray[j]) + 1);
+    } else {
+      cardFrequencies.set(cardArray[j], 1);
+    }
+  }
+  return cardFrequencies;
+}
+
+//Determine the hand type for given hand and card frequencies
+function determineHandType(cardFrequencies, cardArray) {
+    let handType = "HC";
+    if (cardFrequencies.size == 1) {
+      handType = "5X";
+    } else if (cardFrequencies.size == 2) {
+      //Get one of the frequencies (just grab first one)
+      let arbitraryFreq = cardFrequencies.get(cardArray[0]);
+      if (arbitraryFreq == 1 || arbitraryFreq == 4) {
+        handType = "4X";
+      } else {
+        handType = "FH";
+      }
+    } else if (cardFrequencies.size == 3) {
+      let maxFreq = 0;
+      for (let k = 0; k < cardArray.length; k++) {
+        if (cardFrequencies.get(cardArray[k]) > maxFreq) {
+          maxFreq = cardFrequencies.get(cardArray[k])
+        }
+      }
+      if (maxFreq == 3) {
+        handType = "3X";
+      } else {
+        handType = "2P";
+      }
+    } else if (cardFrequencies.size == 4) {
+      handType = "1P";
+    }
+    return handType;
+}
 
 //Find the number of ways to win a boat race
 //given the time allowed and the record winning distance
@@ -154,6 +321,85 @@ function day5() {
 
   document.getElementById("puzzleoutput").innerText = "Part 1: Minimum Location = " + minLocation;
   document.getElementById("puzzleoutput").innerText += "\nPart 2: Minimum Location = " + part2MinLocation;
+}
+
+//Almanac Map Class
+class AlmanacMap {
+  //Create new almanac map reading from the given input string array for the specified map
+  constructor(dataTypeFrom, dataTypeTo, lines) {
+    this.ranges = new Array();
+    this.dataTypeFrom = dataTypeFrom;
+    this.dataTypeTo = dataTypeTo;
+
+    //Parse the map out from the given lines if provided
+    if (lines != "") {
+      let mapStarted = false;
+      for (let i = 0; i < lines.length; i++) {
+        let lineSplit = lines[i].split(' ');
+        if (mapStarted) {
+          if (lineSplit.length == 3) {
+            this.ranges.push(new AlmanacRange(lineSplit[0], lineSplit[1], lineSplit[2]));
+          } else {
+            //finished parsing map
+            break;
+          }
+        } else if (lineSplit[0] == this.dataTypeFrom + '-to-' + this.dataTypeTo) {
+          mapStarted = true;
+        }
+      }
+    }
+  }
+  //Push the given almanac range to map
+  pushRange(range) {
+    if (range.range == 0) {
+      console.log("Help!");
+    }
+    this.ranges.push(range);
+  }
+  //Prints this almanac map
+  print() {
+    let printValue = "";
+    for (let i = 0; i < this.ranges.length; i++) {
+      printValue += this.ranges[i].print() + ',';
+    }
+    return printValue;
+  }
+  //Translate given source value using this map's ranges
+  translateSourceValue(sourceValue) {
+    for (let i = 0; i < this.ranges.length; i++) {
+      if (this.ranges[i].isSrcValueInRange(sourceValue)) {
+        return this.ranges[i].translateSourceValue(sourceValue);
+      }
+    }
+    return sourceValue;
+  }
+}
+
+//Almanac Range Class
+class AlmanacRange {
+  //Constructs new almanac range with given input values
+  constructor(outputStart, inputStart, range) {
+    this.range = parseInt(range);
+    this.inputStart = parseInt(inputStart);
+    this.inputEnd = this.inputStart + this.range - 1;
+    this.outputStart = parseInt(outputStart);
+    this.outputEnd = this.outputStart + this.range - 1;
+  }
+  //Returns true if the given source value is within this ranges input value range
+  isSrcValueInRange(srcValue) {
+    if (srcValue >= this.inputStart && srcValue <= this.inputStart + this.range - 1) {
+      return true;
+    }
+    return false;
+  }
+  //Translates given source value input using the map
+  translateSourceValue(srcValue) {
+    return this.outputStart + (srcValue - this.inputStart);
+  }
+  //Prints out the AlmanacRange
+  print() {
+    return "{ inputStart: " + this.inputStart + ", range: " + this.range + ", outputStart: " + this.outputStart + '}';
+  }
 }
 
 //Part 1: Calculates the point total for given scratch tickets
@@ -419,88 +665,6 @@ function day1() {
   //Set the output to user
   document.getElementById("puzzleoutput").innerText = "Part 1: Sum of first / last digits = " + calibrationSum;
   document.getElementById("puzzleoutput").innerText += "\nPart 2: Sum of first / last digits (including text nums) = " + calibrationSumIncludeTextNums;
-}
-//#endregion
-
-//#region Helper Functions & Classes
-
-//Almanac Map Class
-class AlmanacMap {
-  //Create new almanac map reading from the given input string array for the specified map
-  constructor(dataTypeFrom, dataTypeTo, lines) {
-    this.ranges = new Array();
-    this.dataTypeFrom = dataTypeFrom;
-    this.dataTypeTo = dataTypeTo;
-
-    //Parse the map out from the given lines if provided
-    if (lines != "") {
-      let mapStarted = false;
-      for (let i = 0; i < lines.length; i++) {
-        let lineSplit = lines[i].split(' ');
-        if (mapStarted) {
-          if (lineSplit.length == 3) {
-            this.ranges.push(new AlmanacRange(lineSplit[0], lineSplit[1], lineSplit[2]));
-          } else {
-            //finished parsing map
-            break;
-          }
-        } else if (lineSplit[0] == this.dataTypeFrom + '-to-' + this.dataTypeTo) {
-          mapStarted = true;
-        }
-      }
-    }
-  }
-  //Push the given almanac range to map
-  pushRange(range) {
-    if (range.range == 0) {
-      console.log("Help!");
-    }
-    this.ranges.push(range);
-  }
-  //Prints this almanac map
-  print() {
-    let printValue = "";
-    for (let i = 0; i < this.ranges.length; i++) {
-      printValue += this.ranges[i].print() + ',';
-    }
-    return printValue;
-  }
-  //Translate given source value using this map's ranges
-  translateSourceValue(sourceValue) {
-    for (let i = 0; i < this.ranges.length; i++) {
-      if (this.ranges[i].isSrcValueInRange(sourceValue)) {
-        return this.ranges[i].translateSourceValue(sourceValue);
-      }
-    }
-    return sourceValue;
-  }
-}
-
-//Almanac Range Class
-class AlmanacRange {
-  //Constructs new almanac range with given input values
-  constructor(outputStart, inputStart, range) {
-    this.range = parseInt(range);
-    this.inputStart = parseInt(inputStart);
-    this.inputEnd = this.inputStart + this.range - 1;
-    this.outputStart = parseInt(outputStart);
-    this.outputEnd = this.outputStart + this.range - 1;
-  }
-  //Returns true if the given source value is within this ranges input value range
-  isSrcValueInRange(srcValue) {
-    if (srcValue >= this.inputStart && srcValue <= this.inputStart + this.range - 1) {
-      return true;
-    }
-    return false;
-  }
-  //Translates given source value input using the map
-  translateSourceValue(srcValue) {
-    return this.outputStart + (srcValue - this.inputStart);
-  }
-  //Prints out the AlmanacRange
-  print() {
-    return "{ inputStart: " + this.inputStart + ", range: " + this.range + ", outputStart: " + this.outputStart + '}';
-  }
 }
 
 function isNumSpelledOut(numString) {
