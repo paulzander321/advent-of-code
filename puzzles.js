@@ -8,18 +8,138 @@ function runPuzzle() {
   }
 }
 
+//#region Solved Puzzles
+
+//Wowzers, my math minor means nothing anymore!
 function day8() {
   let input = document.getElementById("puzzleinput").value;
   let lines = input.split("\n");
 
+  //Create a map of each map node which points to its left and right
+  //Also save an array of new map nodes for each of these
+  let directionIdMapping = new Map();
+  let nodeArray = new Array();
+  for (let i = 2; i < lines.length; i++) {
+    let lineSplit = lines[i].replace("= (", "").replace(",", "").replace(")", "").split(' ');
+    directionIdMapping.set(lineSplit[0], { left: lineSplit[1], right: lineSplit[2]});
+    nodeArray.push(new MapNode(lineSplit[0]));
+  }
 
+  //For each map node in our array, connect to the nodes corresponding to the left / right
+  for (let i = 0; i < nodeArray.length; i++) {
+    let leftNodeId = directionIdMapping.get(nodeArray[i].nodeId).left;
+    let rightNodeId = directionIdMapping.get(nodeArray[i].nodeId).right;
+    if (nodeArray[i].nodeId != leftNodeId) {
+      nodeArray[i].left = findNode(leftNodeId, nodeArray);
+    }
+    if (nodeArray[i].nodeId != rightNodeId) {
+      nodeArray[i].right = findNode(rightNodeId, nodeArray);
+    }
+  }
+
+  //Part 1: Find the number of steps required to go from "AAA" to "ZZZ" nodes
+  let directionPattern = lines[0].split('');
+  let startNode = findNode("AAA", nodeArray);
+  let finishNodeId = "ZZZ";
+  let currentNode = startNode;
+  let stepCount = 0;
+  if (startNode != null) {
+    while (currentNode.nodeId != finishNodeId) {
+      let direction = directionPattern[stepCount % (directionPattern.length)];
+      if (direction == "L") {
+        currentNode = currentNode.left;
+      } else {
+        currentNode = currentNode.right;
+      }
+      stepCount++;
+    }
+  }
+
+  //Part 2: Find the counts required for all starting positions (ends with 'A') to get to the first ending node (ends with 'Z')
+  //Stores an array of the starting positions and a map from starting position to the step count (as array)
+  const countsOfCountsToFind = 1;
+  let stepCountMap = new Map();
+  let startPositions = new Array();
+  for (let i = 0; i < nodeArray.length; i++) {
+    if (nodeArray[i].nodeId.substr(nodeArray[i].nodeId.length - 1) == 'A') {
+      stepCountMap.set(nodeArray[i].nodeId, getStepsToFinish(nodeArray[i], directionPattern, countsOfCountsToFind));
+      startPositions.push(nodeArray[i].nodeId);
+    }
+  }
+
+  //Figure out the least common multiple (LCM) of the values gathered
+  //This is largely based on the puzzle input and would not work for a general solution
+  //since there could be inputs where we end at more than one 'XYZ' node for a given start node
+  let lcmAllFirstFinishCounts = 0;
+  for (let i = 0; i < startPositions.length; i++) {
+    if (i == 0) {
+      lcmAllFirstFinishCounts = stepCountMap.get(startPositions[i]);
+    } else {
+      lcmAllFirstFinishCounts = lcm(lcmAllFirstFinishCounts, stepCountMap.get(startPositions[i]));
+    }
+  }
 
   //Return values
-  document.getElementById("puzzleoutput").innerText = "Part 1: Answer = " + 0;
-  document.getElementById("puzzleoutput").innerText += "\nPart 2: Answer = " + 0;
+  document.getElementById("puzzleoutput").innerText = "Part 1: Answer = " + stepCount;
+  document.getElementById("puzzleoutput").innerText += "\nPart 2: Answer = \n" + lcmAllFirstFinishCounts;
 }
 
-//#region Solved Puzzles
+//Least Common Multiple
+//returns the least common multiple of two integers
+function lcm(a, b) {
+  return (a * b) / gcd(a, b);
+}
+
+//Greatest Common Divisor
+//returns the greatest common divisor of two integers
+//using Euclidean Algorithm for this, had to look it up on wikipedia
+function gcd(a, b) {
+  if (b == 0) {
+    return a;
+  } else {
+    return gcd(b, a % b);
+  }
+}
+
+//Return array of the number of steps it takes to get to node ending with "Z"
+//numStepLoops determines how many times we continue after finding the first end node
+function getStepsToFinish(startNode, directionPattern, numStepLoops) {
+  let counts = new Array();
+  let loopCount = 0;
+  let stepCount = 0;
+  while (loopCount < numStepLoops) {
+    if (startNode.nodeId.substr(startNode.nodeId.length - 1) == "Z") {
+      counts.push(stepCount);
+      loopCount++;
+    }
+    let direction = directionPattern[stepCount % (directionPattern.length)];
+    if (direction == "L") {
+      startNode = startNode.left;
+    } else {
+      startNode = startNode.right;
+    }
+    stepCount++;
+  }
+  return counts;
+}
+
+//Search node array for specified node ID
+function findNode(nodeSearchId, nodeArray) {
+  for (let i = 0; i < nodeArray.length; i++) {
+    if (nodeArray[i].nodeId == nodeSearchId) {
+      return nodeArray[i];
+    }
+  }
+}
+
+//Basic data structure for map node, contains left and right path nodes
+class MapNode {
+  constructor(nodeId) {
+    this.nodeId = nodeId;
+    this.left = null;
+    this.right = null;
+  }
+}
 
 //Value mapping for the camel game hand types
 const camelHandTypes = new Map([
