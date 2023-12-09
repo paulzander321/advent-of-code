@@ -10,6 +10,64 @@ function runPuzzle() {
 
 //#region Solved Puzzles
 
+function day9() {
+  let input = document.getElementById("puzzleinput").value;
+  let lines = input.split("\n");
+
+  //Parse the data lines, predict the next values
+  let totalPrediction = 0;
+  let totalReversePrediction = 0;
+  for (let i = 0; i < lines.length; i++) {
+    let originalInput = lines[i].split(' ');
+    let finalLineValues = new Array();
+    finalLineValues.push(parseInt(originalInput[originalInput.length - 1]));
+    let firstLineValues = new Array();
+    firstLineValues.push(parseInt(originalInput[0]));
+    let currentLine = originalInput;
+    // console.log(currentLine);
+    while (!allZeros(currentLine)) {
+      currentLine = getDifferences(currentLine);
+      finalLineValues.push(currentLine[currentLine.length - 1]);
+      firstLineValues.push(currentLine[0]);
+      // console.log(currentLine);
+    }
+    for (let j = 0; j < finalLineValues.length; j++) {
+      totalPrediction += parseInt(finalLineValues[j]);
+    }
+
+    //Do the reverse predictions (history)
+    let linePredictReverse = 0;
+    let firstLinePredictions = new Array();
+    for (let j = firstLineValues.length - 1; j >= 0; j--) {
+      firstLinePredictions.push(firstLineValues[j] - linePredictReverse);
+      linePredictReverse = firstLineValues[j] - linePredictReverse
+    }
+    console.log(firstLinePredictions);
+    totalReversePrediction += firstLinePredictions[firstLinePredictions.length - 1];
+  }
+
+  //Return values
+  document.getElementById("puzzleoutput").innerText = "Part 1: Answer = " + totalPrediction;
+  document.getElementById("puzzleoutput").innerText += "\nPart 2: Answer = " + totalReversePrediction;
+}
+
+function getDifferences(numArray) {
+  let newLine = new Array();
+  for (let i = 0; i < numArray.length - 1; i++) {
+    newLine.push(parseInt(numArray[i + 1]) - parseInt(numArray[i]));
+  }
+  return newLine;
+}
+
+function allZeros(numArray) {
+  for (let i = 0; i < numArray.length; i++) {
+    if (numArray[i] != '0' && numArray[i] != '') {
+      return false;
+    }
+  }
+  return true;
+}
+
 //Wowzers, my math minor means nothing anymore!
 function day8() {
   let input = document.getElementById("puzzleinput").value;
