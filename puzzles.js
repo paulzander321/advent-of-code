@@ -173,10 +173,10 @@ function day10() {
   //Create the matrix representing the pipe map
   let pipeMap = new Array();
   let pipeMapTraversed = new Array();
+  let pipeMapOneWayTraversal = new Array();
   let startingSpot = null;
   for (let i = 0; i < lines.length; i++) {
     let lineSplit = lines[i].split('');
-    let emptyArray = new Array(lineSplit.length);
     for (let j = 0; j < lineSplit.length; j++) {
       let coordinate = new pipeMapCoordinate(j, i, lineSplit[j]);
       lineSplit[j] = coordinate
@@ -185,29 +185,42 @@ function day10() {
       }
     }
     pipeMap.push(lineSplit);
-    pipeMapTraversed.push(emptyArray);
+    pipeMapOneWayTraversal.push(new Array(lineSplit.length));
+    pipeMapTraversed.push(new Array(lineSplit.length));
   }
 
   //Traverse through the pipes until filled
+  let singleDirection = null;
   if (startingSpot != null) {
     pipeMapTraversed[startingSpot.y][startingSpot.x] = 0
+    pipeMapOneWayTraversal[startingSpot.y][startingSpot.x] = 0;
     let validDirections = new Array();
     //figure out which directions are valid to traverse
     let traverseNorth = startingSpot.traverse(pipeMap, pipeMapTraversed, "north");
     if (traverseNorth != null) {
       validDirections.push(traverseNorth);
+      singleDirection = startingSpot.traverse(pipeMap, pipeMapOneWayTraversal, "north");
     }
     let traverseEast = startingSpot.traverse(pipeMap, pipeMapTraversed, "east");
     if (traverseEast != null) {
       validDirections.push(traverseEast);
+      if (singleDirection == null) {
+        singleDirection = startingSpot.traverse(pipeMap, pipeMapOneWayTraversal, "east");
+      }
     }
     let traverseSouth = startingSpot.traverse(pipeMap, pipeMapTraversed, "south");
     if (traverseSouth != null) {
       validDirections.push(traverseSouth);
+      if (singleDirection == null) {
+        singleDirection = startingSpot.traverse(pipeMap, pipeMapOneWayTraversal, "south");
+      }
     }
     let traverseWest = startingSpot.traverse(pipeMap, pipeMapTraversed, "west");
     if (traverseWest != null) {
       validDirections.push(traverseWest);
+      if (singleDirection == null) {
+        singleDirection = startingSpot.traverse(pipeMap, pipeMapOneWayTraversal, "west");
+      }
     }
 
     //console.log(validDirections);
@@ -227,13 +240,17 @@ function day10() {
       traverseCount++;
       traversalContinue = nonNullDirectionFound && traverseCount < maxTraverseCount;
     }
+
+    while (singleDirection != null) {
+      singleDirection = singleDirection.traverse(pipeMap, pipeMapOneWayTraversal, "");
+    }
   }
 
   //Print the traversal map to log (canvas also if small enough)
-  printMapTraverseMatrixToLog(pipeMapTraversed);
-  if (pipeMap.length <= 300 && pipeMap[0].length <= 300) {
-    printMatrixToCanvas(pipeMapTraversed);
-  }
+  // if (pipeMap.length <= 300 && pipeMap[0].length <= 300) {
+  //   printMatrixToCanvas(pipeMapTraversed);
+  // }
+  printMatrixToCanvas(pipeMapOneWayTraversal);
 
   //get the largest stored distance from starting point after mapping out the pipe flow
   let furthestPoint = 0; 
@@ -275,8 +292,12 @@ function printMatrixToCanvas(matrix) {
         // Draw cell background
         //ctx.fillStyle = '#1aff00';
         ctx.fillStyle = '#0F380F';
-        if (!isNaN(cellValue) && cellValue <= 9) {
-          ctx.fillStyle = '#1A472A';
+        if (!isNaN(cellValue)) {
+          if (cellValue <= 9 && cellValue > 0) {
+            ctx.fillStyle = '#1A472A';
+          } else if (cellValue == 0) {
+            ctx.fillStyle = '#30804c'
+          }
         }
         ctx.fillRect(x, y, cellWidth, cellHeight);
 
@@ -294,7 +315,7 @@ function printMatrixToCanvas(matrix) {
         if (cellValue != null) {
           ctx.fillStyle = '#1aff00';
           if (!isNaN(cellValue)) {
-            ctx.fillText(cellValue % 100, x + cellWidth / 2, y + cellHeight / 2);
+            ctx.fillText(cellValue, x + cellWidth / 2, y + cellHeight / 2);
           } else {
             ctx.fillText(cellValue, x + cellWidth / 2, y + cellHeight / 2);
           }
