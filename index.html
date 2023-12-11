@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
-    <title>My Janky Advent of Code 2023</title>
+    <title>Advent of Code 2023 Puzzle Solver</title>
     <link rel="stylesheet" type="text/css" href="css/styles.css">
     <link rel="stylesheet alternate" type="text/css" href="css/highcontrast.css">
     <script type="text/javascript" src="puzzles.js"></script>
@@ -11,8 +11,7 @@
     <link rel="icon" type="image/x-icon" href="/images/codewebsitefavicon.png">
   </head>
   <body>
-    <h1 class="title-global" id="intro">Advent of Code 2023 Jank App</h1>
-    <p>This is my puzzle solver for the 2023 <a href="https://adventofcode.com/">Advent of Code</a>, published to my github pages.</p>
+    <h1 class="title-global" id="intro"><a href="https://adventofcode.com/">Advent of Code</a> Puzzle Solver - 2023</h1>
     <p class="warning">If you haven't yet finished today's puzzle then please close this page and go solve it first!</p>
     <div class="custom-select">
       <select title="puzzlechoice" name="puzzlechoice" id="puzzlechoice" name="puzzlechoice">
@@ -20,10 +19,11 @@
       <button type="button" class="button" onclick="runPuzzle()">Run Puzzle</button>
       <button type="button" class="button" onclick="resetPuzzle()">Reset</button>
       <br>
-      <p>Input:</p>
+      <h2 class="puzzleheader">Input:</h2>
       <textarea title="puzzleinput" id="puzzleinput" rows="8" cols="80"></textarea>
-      <p>Output:</p>
+      <h2 class="puzzleheader">Output:</h2>
       <p id="puzzleoutput" class="puzzleoutput"></p>
+      <canvas id="pipemapcanvas"></canvas>
     </div>
   </body>
 </html>

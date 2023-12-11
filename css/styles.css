@@ -1,113 +1,169 @@
-@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@500');
-
 /* Basic styling for the button */
 .button {
-  background-color: forestgreen; /* Lime green background */
-  color: white; /* White text */
-  padding: 10px 20px; /* Top and bottom padding of 10px, left and right padding of 20px */
-  border: none; /* No border */
-  border-radius: 5px; /* Rounded corners */
-  cursor: pointer; /* Cursor changes to pointer to indicate it's clickable */
   font-size: 28px; /* Font size */
-  transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
-  outline: none; /* Remove outline */
-  text-align: center; /* Center the text inside the button */
-  display: inline-block; /* Allows setting margins and doesn't break the flow */
+  background-color: #1aff00; /* Bright green text color */
+  color: #0F380F; /* Dark green background */
+  border: 2px solid #1aff00; /* Bright green border */
+  font-family: 'Courier New', Courier, monospace; /* Monospace font for retro feel */
+  text-transform: uppercase; /* Uppercase text for a computer-like appearance */
+  padding: 10px 20px; /* Padding for button size */
+  cursor: pointer; /* Cursor change to indicate interactivity */
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effect */
 }
 
 /* Hover effect for the button */
 .button:hover {
-  background-color: #32cd32; /* A slightly darker lime green color for hover */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect for depth */
+  background-color: #0F380F; /* Dark green background on hover */
+  color: #1aff00; /* Bright green text color on hover */
 }
 
-/* Active state for the button */
-.button:active {
-  background-color: #2e8b57; /* Even darker shade for when the button is clicked */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Slightly less shadow */
+.button:active, .button:focus {
+  background-color: #1A472A; /* Slightly lighter green for active/focused state */
+  outline: none; /* Remove default focus outline */
+}
+
+.button:disabled {
+  background-color: #0F380F; /* Dark green background */
+  color: #394733; /* Muted green color for disabled text */
+  cursor: not-allowed; /* Cursor to indicate the button is disabled */
+}
+
+@keyframes blinking {
+  0% { background-color: #ff0000; }
+  50% { background-color: #870000; }
+  100% { background-color: #ff0000; }
 }
 
 .warning {
-  color: #048513; /* Dark gold color for text */
-    background-color: #cddfff; /* Soft yellow background */
-    border: 1px solid #bac3ff; /* Light yellow border */
-    padding: 10px; /* Padding for space inside the box */
-    margin: 15px 0; /* Vertical margin for spacing outside the box */
-    border-radius: 5px; /* Rounded corners */
-    font-weight: bold;
-    display: inline-block;
-    font-family: "Source Code Pro";
+  background-color: #ff0000; /* Red background for urgency */
+  color: #ffffff; /* White text for high contrast */
+  border: 1px solid #ff4500; /* Orange-red border for emphasis */
+  font-family: 'Courier New', Courier, monospace; /* Monospace font for retro feel */
+  padding: 10px; /* Padding inside the banner */
+  text-align: center; /* Center the text */
+  margin: 10px 0; /* Add some margin around the banner */
+  animation: blinking 2s infinite; /* Apply the blinking animation */
 }
 
-h1 {
-  font-size: 36px;
-  text-align: center;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  letter-spacing: 1.5px;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-  margin-left: auto;
-  margin-right: auto;
+.title-global {
+  color: #2ed200; /* Orange-red color for distinction */
+  font-family: 'Courier New', Courier, monospace; /* Monospace font for the retro feel */
+  text-transform: uppercase; /* Uppercase text for impact */
+  text-align: center; /* Center the header */
+  font-size: 36px; /* Larger font size for prominence */
+  margin-top: 30px; /* Top margin for spacing */
+  margin-bottom: 20px; /* Bottom margin for spacing */
+  padding: 10px; /* Padding around the text */
+  border-bottom: 3px solid #1aff00; /* Green underline for brand consistency */
+  letter-spacing: 3px; /* Increase letter spacing for retro computer effect */
 }
 
 select {
+  background-color: #0F380F; /* Dark green background */
+  color: #1aff00; /* Bright green text color */
+  border: 1px solid #1aff00; /* Bright green border */
+  font-family: 'Courier New', Courier, monospace; /* Monospace font for retro feel */
+  cursor: pointer; /* Cursor change to indicate interactivity */
+  -moz-appearance: none;
+  -webkit-appearance: none;
   margin: 10px;
   width: 250px;
   padding: 5px 5px 5px 15px;
   font-size: 28px;
-  font-family: "Source Code Pro", monospace;
-  border: 1px solid #CCC;
   height: 60px;
-  -webkit-appearance: none;
-  -moz-appearance: none;
   appearance: none;
-  background: #0f0f23; /*337 x 5*/
-  color: #cccccc;
   border-radius: 5px;
 }
 
-body {
-  background: #0f0f23; /*337 x 5*/
-  color: #cccccc;
-  font-family: "Source Code Pro", monospace;
-  font-weight: 300;
-  font-size: 18pt;
-  min-width: 60em;
+select:hover {
+  background-color: #1A472A; /* Slightly lighter green for hover */
 }
 
+select:focus {
+  border-color: #1A472A; /* Highlight color for border when focused */
+}
+
+body {
+    background-color: #0b2a0b; /* Dark green, almost black, typical for Fallout terminal */
+    color: #1aff00; /* Bright green text color for contrast */
+    font-family: 'Courier New', Courier, monospace; /* Monospace font for the retro feel */
+    line-height: 1.6; /* Adjust line height for better readability */
+    margin: 0; /* Reset default margin */
+    padding: 20px; /* Padding for the body content */
+    font-weight: 300;
+    font-size: 18pt;
+    min-width: 60em;
+}
+
+/* Style for common elements to match the theme */
+h1, h2, h3, h4, h5, h6 {
+    color: #ff4500; /* Orange-red color for headings */
+}
+
+p, li, div, span {
+    font-size: 16px; /* Adjust the font size as needed */
+}
+
+
 a {
-  background: #0f0f23; /*337 x 5*/
-  color: #cccccc;
-  font-family: "Source Code Pro", monospace;
-  font-weight: 300;
-  font-size: 18pt;
-  min-width: 60em;
+  color: #1aff00; /* Bright green text color for links */
+  font-family: 'Courier New', Courier, monospace; /* Monospace font for retro feel */
+  text-decoration: none; /* Remove the default underline */
+}
+
+a:hover, a:focus {
+  color: #ff4500; /* Change color on hover/focus for emphasis */
+  text-decoration: underline; /* Add underline on hover/focus for clarity */
 }
 
 .puzzleoutput {
-  width: 100%;
-  max-width: 1600px;
-  height: auto;
-  padding: 15px;
-  border: 1px;
-  color: inherit;
-  border: 1px solid #666666;
-  background: #10101a;
-  font-size: inherit;
-}
+  white-space: pre-wrap; /* Maintains whitespace and line breaks */
+  word-wrap: break-word; /* Ensures long words don't overflow */
+  overflow-y: auto; /* Adds a scrollbar if the content overflows vertically */
+  max-height: 200px; /* Set a maximum height for the output area */
 
-input[type="text"], textarea {
-  color: inherit;
-  border: 1px solid #666666;
-  background: #10101a;
-  padding: 0 2px;
+  background-color: #0F380F; /* Dark green background */
+  color: #1aff00; /* Bright green text color */
+  border: 1px solid #1aff00; /* Bright green border */
+  font-family: 'Courier New', Courier, monospace; /* Monospace font for retro feel */
+  padding: 10px; /* Padding inside the text area */
+  resize: vertical; /* Allow only vertical resizing */
+  width: 100%; /* Full width to fit container */
+  box-sizing: border-box; /* Include padding and border in the width */
   font-family: inherit;
   font-size: inherit;
   margin: 0;
   border-radius: 5px;
-  width: 100%;
-  height: 150px; /* Initial height */
-  resize: vertical;
+  height: 300px; /* Initial height */
+  line-height: 1.5;
+  overflow: auto; 
+}
+
+.puzzleheader {
+  color: #1aff00; /* Bright green text color */
+  font-family: 'Courier New', Courier, monospace; /* Monospace font for retro feel */
+  text-transform: uppercase; /* Uppercase text for a computer-like appearance */
+  border-bottom: 2px solid #1aff00; /* Green underline for emphasis */
+  padding-bottom: 5px; /* Padding below the text, above the underline */
+  margin-top: 20px; /* Spacing above the header */
+  margin-bottom: 10px; /* Spacing below the header */
+}
+
+
+input[type="text"], textarea {
+  background-color: #0F380F; /* Dark green background */
+  color: #1aff00; /* Bright green text color */
+  border: 1px solid #1aff00; /* Bright green border */
+  font-family: 'Courier New', Courier, monospace; /* Monospace font for retro feel */
+  padding: 10px; /* Padding inside the text area */
+  resize: vertical; /* Allow only vertical resizing */
+  width: 100%; /* Full width to fit container */
+  box-sizing: border-box; /* Include padding and border in the width */
+  font-family: inherit;
+  font-size: inherit;
+  margin: 0;
+  border-radius: 5px;
+  height: 300px; /* Initial height */
   line-height: 1.5;
   overflow: auto; 
 }

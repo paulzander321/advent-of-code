@@ -210,7 +210,7 @@ function day10() {
       validDirections.push(traverseWest);
     }
 
-    console.log(validDirections);
+    //console.log(validDirections);
 
     //Start iterating through the directions until we hit dead ends on all fronts
     const maxTraverseCount = 999999;
@@ -229,8 +229,13 @@ function day10() {
     }
   }
 
+  //Print the traversal map to log (canvas also if small enough)
   printMapTraverseMatrixToLog(pipeMapTraversed);
+  if (pipeMap.length <= 300 && pipeMap[0].length <= 300) {
+    printMatrixToCanvas(pipeMapTraversed);
+  }
 
+  //get the largest stored distance from starting point after mapping out the pipe flow
   let furthestPoint = 0; 
   for (let i = 0; i < pipeMapTraversed.length; i++) {
     for (let j = 0; j < pipeMapTraversed[i].length; j++) {
@@ -243,6 +248,60 @@ function day10() {
   //Return values
   document.getElementById("puzzleoutput").innerText = "Part 1: Answer = " + furthestPoint;
   document.getElementById("puzzleoutput").innerText += "\nPart 2: Answer = " + 0;
+}
+
+//Print canvas out to element ID "pipemapcanvas"
+function printMatrixToCanvas(matrix) {
+  const canvas = document.getElementById('pipemapcanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (matrix != null && matrix.length > 0 && matrix[0].length > 0) {
+    const numRows = matrix.length;
+    const numCols = matrix[0].length;
+    
+    // Calculate cell size to fit the canvas
+    canvas.width = numCols * 30;
+    canvas.height = numRows * 30;
+    const cellWidth = canvas.width / numCols;
+    const cellHeight = canvas.height / numRows;
+
+    for (let i = 0; i < numRows; i++) {
+      for (let j = 0; j < numCols; j++) {
+        const cellValue = matrix[i][j];
+        const x = j * cellWidth;
+        const y = i * cellHeight;
+
+        // Draw cell background
+        //ctx.fillStyle = '#1aff00';
+        ctx.fillStyle = '#0F380F';
+        if (!isNaN(cellValue) && cellValue <= 9) {
+          ctx.fillStyle = '#1A472A';
+        }
+        ctx.fillRect(x, y, cellWidth, cellHeight);
+
+        // Draw border
+        ctx.strokeStyle = '#1aff00';
+        ctx.strokeRect(x, y, cellWidth, cellHeight);
+
+        // Adjust font size relative to cell size
+        const fontSize = Math.min(cellWidth, cellHeight) / 2; // Example ratio
+        ctx.font = fontSize + 'px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // Draw cell value
+        if (cellValue != null) {
+          ctx.fillStyle = '#1aff00';
+          if (!isNaN(cellValue)) {
+            ctx.fillText(cellValue % 100, x + cellWidth / 2, y + cellHeight / 2);
+          } else {
+            ctx.fillText(cellValue, x + cellWidth / 2, y + cellHeight / 2);
+          }
+        }
+      }
+    }
+  }
 }
 
 //Print out the map traversal matrix (consists of integers (or null values))
@@ -263,6 +322,94 @@ function printMapTraverseMatrixToLog(matrix) {
 }
 
 //#region Solved Puzzles
+
+function day11() {
+  let input = document.getElementById("puzzleinput").value;
+  let lines = input.split("\n");
+  let starImageMatrix = new Array();
+  for (let i = 0; i < lines.length; i++) {
+    starImageMatrix.push(lines[i].split(''));
+  }
+
+  //Account for cosmic expansion along rows
+  for (let y = 0; y < starImageMatrix.length; y++) {
+    let blankRow = true;
+    for (let x = 0; x < starImageMatrix[y].length; x++) {
+      if (starImageMatrix[y][x] == "#") {
+        blankRow = false;
+      }
+    }
+    if (blankRow) {
+      for (let x = 0; x < starImageMatrix[y].length; x++) {
+        starImageMatrix[y][x] = 'X';
+      }
+    }
+  }
+
+  //Account for cosmic expansion along columns
+  for (let x = 0; x < starImageMatrix[0].length; x++) {
+    let blankColumn = true;
+    for (let y = 0; y < starImageMatrix.length; y++) {
+      if (starImageMatrix[y][x] == "#") {
+        blankColumn = false;
+        break;
+      }
+    }
+    if (blankColumn) {
+      for (let y = 0; y < starImageMatrix.length; y++) {
+        starImageMatrix[y][x] = 'X';
+      }
+    }
+  }
+
+  //Print the star map after expansion
+  printMatrixToCanvas(starImageMatrix);
+
+  //Map out the coordinates of the stars from image matrix
+  const starMap = new Array();
+  for (let y = 0; y < starImageMatrix.length; y++) {
+    for (let x = 0; x < starImageMatrix[y].length; x++) {
+      if (starImageMatrix[y][x] == '#') {
+        //found star, store coordinates
+        starMap.push({ x:x, y:y });
+      }
+    }
+  }
+
+  //Measure the star distances, encorporate the expansion factor
+  let starDistanceTotals = 0;
+  let starTotalsMegaExpansion = 0;
+  const expansionFactor = 1000000;
+  for (let i = 0; i < starMap.length; i++) {
+    for (let j = i + 1; j < starMap.length; j++) {
+      let crossingCount = expansionCrossingCount(starImageMatrix, starMap[i], starMap[j]);
+      starDistanceTotals += Math.abs(starMap[j].y - starMap[i].y) + Math.abs(starMap[j].x - starMap[i].x) + crossingCount;
+      starTotalsMegaExpansion += Math.abs(starMap[j].y - starMap[i].y) + Math.abs(starMap[j].x - starMap[i].x) + (crossingCount * expansionFactor) - crossingCount;
+    }
+  }
+
+  console.log(starMap);
+
+  //Return values
+  document.getElementById("puzzleoutput").innerText = "Part 1: Answer = " + starDistanceTotals;
+  document.getElementById("puzzleoutput").innerText += "\nPart 2: Answer = " + starTotalsMegaExpansion;
+}
+
+//Determines the number of exanses (row/column with 'X') between the two stars
+function expansionCrossingCount(starImageMatrix, coordinateOne, coordinateTwo) {
+  let crossingCount = 0;
+  for (let y = Math.min(coordinateOne.y, coordinateTwo.y); y < Math.max(coordinateOne.y, coordinateTwo.y); y++) {
+    if (starImageMatrix[y][Math.max(coordinateOne.x, coordinateTwo.x)] == 'X') {
+      crossingCount++;
+    }
+  }
+  for (let x = Math.min(coordinateOne.x, coordinateTwo.x); x < Math.max(coordinateOne.x, coordinateTwo.x); x++) {
+    if (starImageMatrix[Math.max(coordinateOne.y, coordinateTwo.y)][x] == 'X') {
+      crossingCount++;
+    }
+  }
+  return crossingCount;
+}
 
 function day9() {
   let input = document.getElementById("puzzleinput").value;

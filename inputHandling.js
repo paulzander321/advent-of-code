@@ -16,8 +16,8 @@ function populateChoices() {
   for (let i = 1; i <= daysOfPuzzleReleased; i++) {
     select.appendChild(createOption(`Day ${i}`, `day${i}`));
   }
-  //select.selectedIndex = (daysOfPuzzleReleased - 1);
-  select.selectedIndex = 9;
+  select.selectedIndex = (daysOfPuzzleReleased - 1);
+  // select.selectedIndex = 9;
 }
 
 //Create option element with given text and value
@@ -32,4 +32,8 @@ function createOption(text, value) {
 function resetPuzzle() {
   document.getElementById("puzzleinput").value = "";
   document.getElementById("puzzleoutput").innerHTML = "";
+
+  const canvas = document.getElementById('pipemapcanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
