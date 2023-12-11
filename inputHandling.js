@@ -16,7 +16,8 @@ function populateChoices() {
   for (let i = 1; i <= daysOfPuzzleReleased; i++) {
     select.appendChild(createOption(`Day ${i}`, `day${i}`));
   }
-  select.selectedIndex = (daysOfPuzzleReleased - 1);
+  //select.selectedIndex = (daysOfPuzzleReleased - 1);
+  select.selectedIndex = 9;
 }
 
 //Create option element with given text and value

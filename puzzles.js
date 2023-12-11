@@ -8,6 +8,260 @@ function runPuzzle() {
   }
 }
 
+//pipe map terrain types, mostly for reference
+const pipeMapTerrainTypes = new Map([
+  ["|", "north <-> south"],
+  ["-", "east <-> west"],
+  ["L", "north <-> east"],
+  ["J", "north <-> west"],
+  ["7", "south <-> west"],  
+  ["F", "south <-> east"],
+  [".", "ground"],
+  ["S", "starting location"]
+]);
+
+const pipeMapDirectionToValidPipeTerrains = new Map([
+  ["north", "|LJ"],
+  ["east", "-J7"],
+  ["south", "|7F"],
+  ["west", "-FL"]
+]);
+
+class pipeMapCoordinate {
+  constructor(x, y, terrainType) {
+    this.x = x;
+    this.y = y;
+    this.terrainType = terrainType;
+    this.prev = null;
+  }
+
+  traverse(pipeMap, mapTraversed, originDirection) {
+    let firstMoveAttempt = null;
+    switch (this.terrainType) {
+      case "S":
+        if (originDirection != "") {
+          switch (originDirection) {
+            case "north":
+              if (coordinateInBoundsFreeAndValid(this.x, this.y + 1, mapTraversed, pipeMap, "|LJ")) {
+                mapTraversed[this.y + 1][this.x] = 1;
+                return getMapCoordinate(this.x, this.y + 1, pipeMap);
+              } else {
+                return null;
+              }
+            case "east":
+              if (coordinateInBoundsFreeAndValid(this.x + 1, this.y, mapTraversed, pipeMap, "-J7")) {
+                mapTraversed[this.y][this.x + 1] = 1;
+                return getMapCoordinate(this.x + 1, this.y, pipeMap);
+              } else {
+                return null;
+              }
+            case "south":
+              if (coordinateInBoundsFreeAndValid(this.x, this.y - 1, mapTraversed, pipeMap, "|7F")) {
+                mapTraversed[this.y - 1][this.x] = 1;
+                return getMapCoordinate(this.x, this.y - 1, pipeMap);
+              } else {
+                return null;
+              }
+            case "west":
+              if (coordinateInBoundsFreeAndValid(this.x - 1, this.y, mapTraversed, pipeMap, "-FL")) {
+                mapTraversed[this.y][this.x - 1] = 1;
+                return getMapCoordinate(this.x - 1, this.y, pipeMap);
+              } else {
+                return null;
+              }
+          }
+        }
+        return null;
+      case ".":
+        return null;
+      case "|":
+        firstMoveAttempt = moveIfPossible("north", this, pipeMap, mapTraversed);
+        if (firstMoveAttempt != null) {
+          return firstMoveAttempt;
+        } else {
+          return moveIfPossible("south", this, pipeMap, mapTraversed);
+        }
+      case "-":
+        firstMoveAttempt = moveIfPossible("east", this, pipeMap, mapTraversed);
+        if (firstMoveAttempt != null) {
+          return firstMoveAttempt;
+        } else {
+          return moveIfPossible("west", this, pipeMap, mapTraversed);
+        }
+      case "L":
+        firstMoveAttempt = moveIfPossible("south", this, pipeMap, mapTraversed);
+        if (firstMoveAttempt != null) {
+          return firstMoveAttempt;
+        } else {
+          return moveIfPossible("east", this, pipeMap, mapTraversed);
+        }
+      case "J":
+        firstMoveAttempt = moveIfPossible("south", this, pipeMap, mapTraversed);
+        if (firstMoveAttempt != null) {
+          return firstMoveAttempt;
+        } else {
+          return moveIfPossible("west", this, pipeMap, mapTraversed);
+        }
+      case "7":
+        firstMoveAttempt = moveIfPossible("north", this, pipeMap, mapTraversed);
+        if (firstMoveAttempt != null) {
+          return firstMoveAttempt;
+        } else {
+          return moveIfPossible("west", this, pipeMap, mapTraversed);
+        }
+      case "F":
+        firstMoveAttempt = moveIfPossible("north", this, pipeMap, mapTraversed);
+        if (firstMoveAttempt != null) {
+          return firstMoveAttempt;
+        } else {
+          return moveIfPossible("east", this, pipeMap, mapTraversed);
+        }
+    }
+  }
+}
+
+function moveIfPossible(direction, mapCoordinate, pipeMap, mapTraversed) {
+  switch (direction) {
+    case "north":
+      if (coordinateInBoundsFreeAndValid(mapCoordinate.x, mapCoordinate.y + 1, mapTraversed, pipeMap, pipeMapDirectionToValidPipeTerrains.get("north"))) {
+        mapTraversed[mapCoordinate.y + 1][mapCoordinate.x] = mapTraversed[mapCoordinate.y][mapCoordinate.x] + 1;
+        return getMapCoordinate(mapCoordinate.x, mapCoordinate.y + 1, pipeMap);
+      } else {
+        return null;
+      }
+    case "east":
+      if (coordinateInBoundsFreeAndValid(mapCoordinate.x + 1, mapCoordinate.y, mapTraversed, pipeMap, pipeMapDirectionToValidPipeTerrains.get("east"))) {
+        mapTraversed[mapCoordinate.y][mapCoordinate.x + 1] = mapTraversed[mapCoordinate.y][mapCoordinate.x] + 1;
+        return getMapCoordinate(mapCoordinate.x + 1, mapCoordinate.y, pipeMap);
+      } else {
+        return null;
+      }
+    case "south":
+      if (coordinateInBoundsFreeAndValid(mapCoordinate.x, mapCoordinate.y - 1, mapTraversed, pipeMap, pipeMapDirectionToValidPipeTerrains.get("south"))) {
+        mapTraversed[mapCoordinate.y - 1][mapCoordinate.x] = mapTraversed[mapCoordinate.y][mapCoordinate.x] + 1;
+        return getMapCoordinate(mapCoordinate.x, mapCoordinate.y - 1, pipeMap);
+      } else {
+        return null;
+      }
+    case "west":
+      if (coordinateInBoundsFreeAndValid(mapCoordinate.x - 1, mapCoordinate.y, mapTraversed, pipeMap, pipeMapDirectionToValidPipeTerrains.get("west"))) {
+        mapTraversed[mapCoordinate.y][mapCoordinate.x - 1] = mapTraversed[mapCoordinate.y][mapCoordinate.x] + 1;
+        return getMapCoordinate(mapCoordinate.x - 1, mapCoordinate.y, pipeMap);
+      } else {
+        return null;
+      }
+    default:
+      return null;
+  }
+}
+
+//Return the map coordinate at the given location
+function getMapCoordinate(x, y, mapMatrix) {
+  return mapMatrix[y][x];
+}
+
+//Determine if the given coordinates are within the map bounds, not already traversed, and the terrain type is one of those specified
+function coordinateInBoundsFreeAndValid(x, y, mapTraverseMatrix, pipeMap, terrainTypes) {
+  return y >= 0 && y < mapTraverseMatrix.length && x >= 0 && x < mapTraverseMatrix[y].length && mapTraverseMatrix[y][x] == null && terrainTypes.includes(pipeMap[y][x].terrainType); 
+}
+
+//pipe crawlin' & pipe mappin'
+function day10() {
+  let input = document.getElementById("puzzleinput").value;
+  let lines = input.split("\n");
+
+  //Create the matrix representing the pipe map
+  let pipeMap = new Array();
+  let pipeMapTraversed = new Array();
+  let startingSpot = null;
+  for (let i = 0; i < lines.length; i++) {
+    let lineSplit = lines[i].split('');
+    let emptyArray = new Array(lineSplit.length);
+    for (let j = 0; j < lineSplit.length; j++) {
+      let coordinate = new pipeMapCoordinate(j, i, lineSplit[j]);
+      lineSplit[j] = coordinate
+      if (coordinate.terrainType == "S") {
+        startingSpot = coordinate;
+      }
+    }
+    pipeMap.push(lineSplit);
+    pipeMapTraversed.push(emptyArray);
+  }
+
+  //Traverse through the pipes until filled
+  if (startingSpot != null) {
+    pipeMapTraversed[startingSpot.y][startingSpot.x] = 0
+    let validDirections = new Array();
+    //figure out which directions are valid to traverse
+    let traverseNorth = startingSpot.traverse(pipeMap, pipeMapTraversed, "north");
+    if (traverseNorth != null) {
+      validDirections.push(traverseNorth);
+    }
+    let traverseEast = startingSpot.traverse(pipeMap, pipeMapTraversed, "east");
+    if (traverseEast != null) {
+      validDirections.push(traverseEast);
+    }
+    let traverseSouth = startingSpot.traverse(pipeMap, pipeMapTraversed, "south");
+    if (traverseSouth != null) {
+      validDirections.push(traverseSouth);
+    }
+    let traverseWest = startingSpot.traverse(pipeMap, pipeMapTraversed, "west");
+    if (traverseWest != null) {
+      validDirections.push(traverseWest);
+    }
+
+    console.log(validDirections);
+
+    //Start iterating through the directions until we hit dead ends on all fronts
+    const maxTraverseCount = 999999;
+    let traverseCount = 0;
+    let traversalContinue = validDirections.length > 0;
+    while (traversalContinue) {
+      let nonNullDirectionFound = false;
+      for (let i = 0; i < validDirections.length; i++) {
+        if (validDirections[i] != null) {
+          nonNullDirectionFound = true;
+          validDirections[i] = validDirections[i].traverse(pipeMap, pipeMapTraversed, "");
+        }
+      }
+      traverseCount++;
+      traversalContinue = nonNullDirectionFound && traverseCount < maxTraverseCount;
+    }
+  }
+
+  printMapTraverseMatrixToLog(pipeMapTraversed);
+
+  let furthestPoint = 0; 
+  for (let i = 0; i < pipeMapTraversed.length; i++) {
+    for (let j = 0; j < pipeMapTraversed[i].length; j++) {
+      if (pipeMapTraversed[i][j] != null && pipeMapTraversed[i][j] > furthestPoint) {
+        furthestPoint = pipeMapTraversed[i][j];
+      }
+    }
+  }
+
+  //Return values
+  document.getElementById("puzzleoutput").innerText = "Part 1: Answer = " + furthestPoint;
+  document.getElementById("puzzleoutput").innerText += "\nPart 2: Answer = " + 0;
+}
+
+//Print out the map traversal matrix (consists of integers (or null values))
+function printMapTraverseMatrixToLog(matrix) {
+  if (matrix != null) {
+    for (let i = 0; i < matrix.length; i++) {
+      let mapLine = "";
+      for (let j = 0; j < matrix[i].length; j++) {
+        if (matrix[i][j] == null) {
+          mapLine += " ";
+        } else {
+          mapLine += matrix[i][j];
+        }
+      }
+      console.log(mapLine);
+    }
+  }
+}
+
 //#region Solved Puzzles
 
 function day9() {
@@ -868,4 +1122,5 @@ function isNumSpelledOut(numString) {
     return -1;
   }
 }
+
 //#endregion
